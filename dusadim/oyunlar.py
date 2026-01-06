@@ -13,49 +13,28 @@ from abc import ABC, abstractmethod
 # =============================================================================================
 
 class Yildiz:
-    """
-    KAPSÜLLEME İLKESİ: Nesneye ait koordinat ve parlama verileri private (__) niteliklerle korunur.
-    ALGORİTMA: Sinüs dalgası fonksiyonu kullanılarak yumuşak bir Alpha geçişi sağlanır.
-    Bu matematiksel yaklaşım, statik görseller yerine dinamik bir atmosfer oluşturmak için tercih edilmiştir.
-    """
     def __init__(self, ekran_genisligi, ekran_yuksekligi):
-        """Yıldız nesnesinin başlangıç koordinatlarını ve fiziksel özelliklerini private olarak belirler."""
         self.__x_koordinati = random.randint(0, ekran_genisligi)
         self.__y_koordinati = random.randint(0, ekran_yuksekligi)
         self.__boyut = random.randint(1, 2)
-        
-        # Her yıldız nesnesi için farklı faz ve hız değerleri atanarak görsel varyasyon sağlanır.
-        # Bu değerler private olduğu için dışarıdan doğrudan değiştirilemez, veri bütünlüğü korunur.
         self.__isik_faz_degeri = random.uniform(0, math.pi * 2)
         self.__isik_degisim_hizi = random.uniform(0.005, 0.015) 
 
     def guncelle_ve_ciz(self, hedef_yuzey):
-        """Alpha kanalını (opaklık) dinamik olarak hesaplar ve yıldızı hedef yüzeye render eder."""
         self.__isik_faz_degeri += self.__isik_degisim_hizi
-        
-        # Sinüs dalgası algoritması: 150-255 arası parlaklık salınımı hesaplanır.
-        # Bu işlem bilişsel süreçte öğrencinin dikkatini arka planda canlı tutmayı hedefler.
         hesaplanan_alfa = int(150 + 105 * math.sin(self.__isik_faz_degeri))
-        
         yildiz_katmani = pygame.Surface((self.__boyut * 2, self.__boyut * 2), pygame.SRCALPHA)
         pygame.draw.circle(yildiz_katmani, (255, 255, 255), (self.__boyut, self.__boyut), self.__boyut)
         yildiz_katmani.set_alpha(hesaplanan_alfa)
         hedef_yuzey.blit(yildiz_katmani, (self.__x_koordinati, self.__y_koordinati))
 
 class KayanYildiz:
-    """
-    TEMİZ KOD İLKESİ: Fonksiyonel metot isimleri ve modüler yapı kullanılmıştır.
-    ALGORİTMA: Kuyruklu yıldız efekti için Alpha düşümü (Fade-out) algoritması uygulanmıştır.
-    Bu algoritma, nesnenin hareket vektörü boyunca azalan opaklıkta parçacıklar bırakmasını sağlar.
-    """
     def __init__(self, genislik, yukseklik):
-        """Kayan yıldızın ekran sınırlarını ve bekleme süresi sayaçlarını yapılandırır."""
         self.__limiti_W = genislik
         self.__limiti_H = yukseklik
         self.nesne_niteliklerini_resetle()
 
     def nesne_niteliklerini_resetle(self):
-        """Parçacık verilerini başlangıç konumuna ve hızına döndürerek döngüyü sürdürür."""
         self.x_konumu = random.randint(-300, self.__limiti_W // 2)
         self.y_konumu = random.randint(0, self.__limiti_H // 2)
         self.hareket_hizi = random.randint(3, 7)
@@ -63,44 +42,34 @@ class KayanYildiz:
         self.bekleme_sayaci = random.randint(100, 300)
 
     def hareket_yurut_ve_ciz(self, hedef_yuzey):
-        """Kuyruklu yıldızın doğrusal hareketini ve görsel izlerini (Tail Rendering) yönetir."""
         if not self.aktiflik_durumu:
-            # Bekleme süresi kontrolü: Yıldızın rastgele zamanlarda çıkmasını sağlar.
             self.bekleme_sayaci -= 1
             if self.bekleme_sayaci <= 0:
                 self.aktiflik_durumu = True
         else:
-            # Vektörel hareket: X ve Y ekseninde sabit oranlı ilerleme.
             self.x_konumu += self.hareket_hizi
             self.y_konumu += self.hareket_hizi * 0.4
-            
-            # Veri Yapısı: Kuyruk parçacıkları için 12 adımlı döngüsel render.
-            # Her adımda opaklık (Alpha) doğrusal olarak azaltılır.
             for i in range(12):
                 iz_alfa = int(180 * (1 - i / 12))
                 iz_objesi = pygame.Surface((2, 2), pygame.SRCALPHA)
                 pygame.draw.circle(iz_objesi, (255, 255, 255, iz_alfa), (1, 1), 1)
                 hedef_yuzey.blit(iz_objesi, (int(self.x_konumu - i * 2), int(self.y_konumu - i * 0.8)))
             
-            # Ekran dışına çıkma kontrolü algoritması
             if self.x_konumu > self.__limiti_W or self.y_konumu > self.__limiti_H:
                 self.nesne_niteliklerini_resetle()
 
 class EvrenselArkaPlan:
-    """MODÜLER YAPI: Tüm alt modüllerde kullanılan ortak görsel katman yöneticisi sınıfı."""
     def __init__(self, W, H):
         self.genislik = W
         self.yukseklik = H
         self.statik_yildiz_havuzu = [Yildiz(W, H) for _ in range(140)]
         self.dinamik_kayan_yildizlar = [KayanYildiz(W, H) for _ in range(3)]
         self.bej_arka_plan_kaplamasi = None
-        
         yol = os.path.join("gorseller", "arka_plan.png")
         if os.path.exists(yol):
             self.bej_arka_plan_kaplamasi = pygame.transform.scale(pygame.image.load(yol).convert(), (W, H))
 
     def ciz(self, hedef_ekran, mod="KOYU"):
-        """KRİTİK UYUM: ana_ekran.py dosyasının beklediği 'mod' parametreli çizim metodu."""
         if mod == "KOYU":
             hedef_ekran.fill((15, 20, 35))
             for yildiz_obj in self.statik_yildiz_havuzu:
@@ -113,14 +82,10 @@ class EvrenselArkaPlan:
             hedef_ekran.fill((240, 240, 230))
 
 # =============================================================================================
-# 2. BÖLÜM: SOYUT OYUN MOTORU (OOP: ABSTRACTION - SOYUTLAMA & INHERITANCE - KALITIM)
+# 2. BÖLÜM: SOYUT OYUN MOTORU (OOP: ABSTRACTION & INHERITANCE)
 # =============================================================================================
 
 class Oyun(ABC):
-    """
-    SOYUT SINIF: Tüm oyun alt sınıfları için zorunlu mimari şablonunu tanımlar.
-    OOP: Miras alan sınıflar calistir() ve soru_hazirla() metotlarını override etmelidir.
-    """
     def __init__(self, ekran, veritabani, sinif_bilgisi, ogrenci_verisi):
         self.ekran = ekran
         self.vt = veritabani
@@ -128,8 +93,6 @@ class Oyun(ABC):
         self.ogrenci = ogrenci_verisi
         self.pencere_W, self.pencere_H = ekran.get_size()
         self.fps_motoru = pygame.time.Clock()
-        
-        # Oyun İçi Global Durum ve Performans Yönetimi
         self.oyun_aktif_durumu = True
         self.mevcut_durum_etiketi = "INTRO_FADE"
         self.toplam_dogru_sayaci = 0
@@ -137,12 +100,8 @@ class Oyun(ABC):
         self.hesaplanan_basari_puani = 0
         self.bitis_ani_toplam_sure = 0
         self.final_sesi_calindi_mi = False
-        
-        # UI Font Ayarları (HUD için küçük font)
         self.font_hud_mini = pygame.font.SysFont("Arial", 18, bold=True)
         self.ana_menuye_donus_butonu = pygame.Rect(self.pencere_W // 2 - 150, 520, 300, 70)
-        
-        # Ses Entegrasyonu (Composition)
         pygame.mixer.init()
         self.ses_dogru_bildirim = self.__medya_yukle("ding_sesi.mp3")
         self.ses_yanlis_bildirim = self.__medya_yukle("yanlis_ses.mp3")
@@ -162,22 +121,19 @@ class Oyun(ABC):
     def calistir(self): pass
 
 # =============================================================================================
-# 3. BÖLÜM: OYUN 1 - FARKLI NESNEYİ BUL (OOP: POLYMORPHISM - ÇOK BİÇİMLİLİK)
+# 3. BÖLÜM: OYUN 1 - FARKLI NESNEYİ BUL (FIXED)
 # =============================================================================================
 
 class FarkliNesneyiBul(Oyun):
-    """GÖRSEL AYRIŞTIRMA MOTORU: Karmaşık nesne grupları arasından sapmayı tespit eder."""
     def __init__(self, ekran, vt, sinif, ogrenci):
         super().__init__(ekran, vt, sinif, ogrenci)
         self.mevcut_durum_etiketi = "TALIMAT"
         self.font_arayuz = pygame.font.SysFont("Arial", 30, bold=True)
         self.font_baslik = pygame.font.SysFont("Arial", 45, bold=True)
-        
         self.__gorsel_kaynaklari_hazirla()
         self.soru_indeksi = 0
         self.sayac_rakami = 3
-        self.__tepki_sureleri_log_listesi = []
-        
+        self.__tepki_sureleri_log_listesi = [] # İsim sabitlendi
         self.soru_havuzu = [
             {"n": "kedi.png", "f": "beneksiz_kedi.png"}, {"n": "ev.png", "f": "farkli_ev.png"},
             {"n": "kus.png", "f": "farkli_kus.png"}, {"n": "mor_kulaklik.png", "f": "farkli_kulaklik.png"},
@@ -194,7 +150,6 @@ class FarkliNesneyiBul(Oyun):
         except: self.tema_img = self.cerceve_img = self.bar_img = None
 
     def soru_hazirla(self):
-        """ALGORİTMA: 16 nesneden birini rastgele 'sapma' olarak seçip konumlandırır."""
         self.izgara_nesne_listesi = []
         paket = self.soru_havuzu[self.soru_indeksi]
         target_idx = random.randint(0, 15)
@@ -203,7 +158,7 @@ class FarkliNesneyiBul(Oyun):
             file = paket["f"] if i == target_idx else paket["n"]
             img = pygame.transform.scale(pygame.image.load(os.path.join("gorseller", file)).convert_alpha(), (100, 100))
             self.izgara_nesne_listesi.append({"rect": r, "target": (i == target_idx), "img": img})
-        self.__soru_baslama_ani = time.time()
+        self.__soru_baslama_ani = time.time() # İsim sabitlendi
 
     def calistir(self):
         o_bas, s_gunc = 0, 0
@@ -211,22 +166,11 @@ class FarkliNesneyiBul(Oyun):
             self.ekran.fill((30, 30, 30))
             if self.tema_img: self.ekran.blit(self.tema_img, (0, 0))
             su_an = time.time()
-            
-            # --- 1) HUD (SKOR/SÜRE/TUR) - SOL ÜST ---
             if self.mevcut_durum_etiketi == "GAME":
                 gecen_sn = int(su_an - o_bas)
                 self.ekran.blit(self.font_hud_mini.render(f"Skor: {self.hesaplanan_basari_puani}", True, (255,255,255)), (15, 15))
                 self.ekran.blit(self.font_hud_mini.render(f"Süre: {gecen_sn}s", True, (255,255,255)), (15, 45))
                 self.ekran.blit(self.font_hud_mini.render(f"Tur: {self.soru_indeksi + 1}/7", True, (255,255,255)), (15, 75))
-                # BAŞLIK YAZISI
-                b_t = self.font_baslik.render("FARKLI NESNEYİ BUL", True, (255, 255, 255))
-                self.ekran.blit(b_t, (self.pencere_W//2 - b_t.get_width()//2, 35))
-                # İLERLEME ÇUBUĞU
-                if self.bar_img:
-                    self.ekran.blit(self.bar_img, (self.pencere_W - 120, 150))
-                    prog = (self.soru_indeksi / 7) * 400
-                    pygame.draw.rect(self.ekran, (46, 204, 113), (self.pencere_W - 110, 150 + (400 - int(prog)), 60, int(prog)), border_radius=5)
-
             for olay_v in pygame.event.get():
                 if olay_v.type == pygame.QUIT: self.oyun_aktif_durumu = False
                 if olay_v.type == pygame.MOUSEBUTTONDOWN:
@@ -239,7 +183,7 @@ class FarkliNesneyiBul(Oyun):
                                 if n["target"]:
                                     if self.ses_dogru_bildirim: self.ses_dogru_bildirim.play()
                                     self.toplam_dogru_sayaci += 1; self.hesaplanan_basari_puani += 14
-                                    self.__tepki_sureleri_log_havuzu.append((su_an - self.__soru_baslama_ani) * 1000)
+                                    self.__tepki_sureleri_log_listesi.append((su_an - self.__soru_baslama_ani) * 1000)
                                     self.soru_indeksi += 1
                                     if self.soru_indeksi < 7: self.soru_hazirla()
                                     else: 
@@ -248,7 +192,6 @@ class FarkliNesneyiBul(Oyun):
                                 else:
                                     if self.ses_yanlis_bildirim: self.ses_yanlis_bildirim.play()
                                     self.toplam_yanlis_sayaci += 1; self.hesaplanan_basari_puani = max(0, self.hesaplanan_basari_puani - 10)
-
             if self.mevcut_durum_etiketi == "TALIMAT": self.__karartma_render("FARKLI NESNEYİ BUL", "BAŞLAMAK İÇİN TIKLAYIN")
             elif self.mevcut_durum_etiketi == "SAYAC":
                 txt = self.font_baslik.render(str(self.sayac_rakami), True, (255, 255, 255))
@@ -271,9 +214,8 @@ class FarkliNesneyiBul(Oyun):
         if self.ses_oyun_sonu and not self.final_sesi_calindi_mi: self.ses_oyun_sonu.play(); self.final_sesi_calindi_mi = True
         ov = pygame.Surface((self.pencere_W, self.pencere_H), pygame.SRCALPHA); ov.fill((0, 0, 0, 220)); self.ekran.blit(ov, (0, 0))
         self.__txt_merkez("OYUN BİTTİ!", self.font_baslik, (255, 215, 0), 160)
-        # --- 2) OYUN SONU İSTATİSTİĞİ (G1) ---
         self.__txt_merkez(f"Doğru: {self.toplam_dogru_sayaci} | Yanlış: {self.toplam_yanlis_sayaci}", self.font_arayuz, (255, 255, 255), 260)
-        self.__txt_merkez(f"Toplam Süre: {self.bitis_ani_toplam_sure} sn | Skor: {self.hesaplanan_basari_puani}", self.font_arayuz, (255, 255, 255), 320)
+        self.__txt_merkez(f"Süre: {self.bitis_ani_toplam_sure} sn | Skor: {self.hesaplanan_basari_puani}", self.font_arayuz, (255, 255, 255), 320)
         pygame.draw.rect(self.ekran, (41, 128, 185), self.ana_menuye_donus_butonu, border_radius=15)
         bt = self.font_arayuz.render("ANA MENÜYE DÖN", True, (255, 255, 255))
         self.ekran.blit(bt, (self.ana_menuye_donus_butonu.centerx-bt.get_width()//2, self.ana_menuye_donus_butonu.centery-bt.get_height()//2))
@@ -282,11 +224,11 @@ class FarkliNesneyiBul(Oyun):
         s = f.render(m, True, r); self.ekran.blit(s, (self.pencere_W//2-s.get_width()//2, y))
 
     def bitir(self):
-        ort = sum(self.__tepki_sureleri_log_havuzu)/len(self.__tepki_sureleri_log_havuzu) if self.__tepki_sureleri_log_havuzu else 0
+        ort = sum(self.__tepki_sureleri_log_listesi)/len(self.__tepki_sureleri_log_listesi) if self.__tepki_sureleri_log_listesi else 0
         self.vt.performans_kaydet(self.ogrenci["ad"], self.ogrenci["soyad"], self.sinif, "Farklı Nesne", self.toplam_dogru_sayaci, self.toplam_yanlis_sayaci, ort)
 
 # =============================================================================================
-# 4. BÖLÜM: OYUN 2 - HAFIZA LAMBALARI (STICKY INTRO & HUD)
+# 4. BÖLÜM: OYUN 2 - HAFIZA LAMBALARI (FIXED)
 # =============================================================================================
 
 class HafizaLambalari(Oyun):
@@ -320,24 +262,19 @@ class HafizaLambalari(Oyun):
         self.__soru_bas_z = time.time()
 
     def calistir(self):
-        s_z, t_id, t_son, o_bas = 0, -1, 0, 0
+        s_z, t_id, t_son, o_bas = 0, -1, 0, 0 # s_z eklendi Unbound önlemek için
         while self.oyun_aktif_durumu:
             simdi_ms = pygame.time.get_ticks()
             su_an_sn = time.time()
             self.arkaplan_yoneticisi.ciz(self.ekran, mod="BEJ") 
-            
-            # HUD - SOL ÜST
             g_sn = int(su_an_sn - o_bas) if o_bas > 0 else 0
             self.ekran.blit(self.font_hud_mini.render(f"Skor: {self.hesaplanan_basari_puani}", True, (30,30,30)), (15, 15))
             self.ekran.blit(self.font_hud_mini.render(f"Süre: {g_sn}s", True, (30,30,30)), (15, 40))
             self.ekran.blit(self.font_hud_mini.render(f"Tur: {self.aktif_tur_no+1}/7", True, (30,30,30)), (15, 65))
-
             if self.mevcut_durum_etiketi != "BITIS":
                 if self.mevcut_durum_etiketi not in ["INTRO_FADE", "INTRO_MOVE", "SAYAC"]:
                     for d in self.daire_nesne_listesi_v: self.ekran.blit(d["img"], d["rect"])
                     if t_id != -1 and simdi_ms < t_son: self.__isik(self.daire_nesne_listesi_v[t_id]["rect"])
-                
-                # --- 3) YAZI ANİMASYONU (STICKY) ---
                 if self.intro_alpha < 255: self.intro_alpha += 5
                 if self.mevcut_durum_etiketi == "INTRO_FADE" and self.intro_alpha >= 255: self.mevcut_durum_etiketi = "INTRO_MOVE"
                 elif self.mevcut_durum_etiketi == "INTRO_MOVE":
@@ -345,10 +282,8 @@ class HafizaLambalari(Oyun):
                     else: 
                         self.mevcut_durum_etiketi = "SAYAC"; s_z = su_an_sn
                         if self.ses_talimat_hafiza: self.ses_talimat_hafiza.play()
-                
                 t_surf = self.font_arayuz_v.render("Lambaları Takip Et!", True, (30,30,30))
                 t_surf.set_alpha(self.intro_alpha); self.ekran.blit(t_surf, (self.pencere_W//2-t_surf.get_width()//2, self.intro_y))
-
             if self.mevcut_durum_etiketi == "SAYAC":
                 self.__ms_render_v("HAZIR!", self.font_arayuz_v, (52, 152, 219), 250)
                 num = self.font_dev_v.render(str(self.geri_sayim_rakami), True, (230, 126, 34))
@@ -375,7 +310,6 @@ class HafizaLambalari(Oyun):
                             self.bitis_ani_toplam_sure = int(su_an_sn - o_bas)
                             self.mevcut_durum_etiketi = "BITIS"; self.bitir()
                     else: self.oyuncu_listesi, self.izleme_idx, self.parlama_ms, self.mevcut_durum_etiketi = [], 0, 0, "IZLEME"
-
             for ev_v in pygame.event.get():
                 if ev_v.type == pygame.QUIT: self.oyun_aktif_durumu = False
                 if ev_v.type == pygame.MOUSEBUTTONDOWN:
@@ -415,7 +349,7 @@ class HafizaLambalari(Oyun):
         self.vt.performans_kaydet(self.ogrenci["ad"], self.ogrenci["soyad"], self.sinif, "Hafıza Lambaları", self.toplam_dogru_sayaci, self.toplam_yanlis_sayaci, ort)
 
 # =============================================================================================
-# 5. BÖLÜM: OYUN 3 - DİZİ TAMAMLAMA (MAX 5 ŞEKİL LİMİTİ)
+# 5. BÖLÜM: OYUN 3 - DİZİ TAMAMLAMA (FIXED)
 # =============================================================================================
 
 class DiziTamamlama(Oyun):
@@ -440,8 +374,7 @@ class DiziTamamlama(Oyun):
     def soru_hazirla(self):
         if self.tur_idx > 0: self.mevcut_durum_etiketi = "HAZIR"
         keys = list(self.sekil_bankasi.keys())
-        s1, s2, s3 = random.sample(keys, 3)
-        # --- 2) ÖZEL İSTEK: MAX 5 ŞEKİL LİMİTİ (PEDAGOJİK AYAR) ---
+        s1, s2 = random.sample(keys, 2)
         if self.tur_idx == 0: self.dizi_verisi = [s1, s2, s1, s2]
         else: self.dizi_verisi = [random.choice(keys) for _ in range(min(5, 4 + self.tur_idx))]
         self.eksik_idx = random.randint(0, len(self.dizi_verisi)-1); self.ans_key = self.dizi_verisi[self.eksik_idx]
@@ -454,19 +387,16 @@ class DiziTamamlama(Oyun):
             if self.ap2_img_yuzeyi_v: self.ekran.blit(self.ap2_img_yuzeyi_v, (0, 0))
             else: self.ekran.fill((240, 240, 235))
             su_an = time.time()
-            
             g_sn = int(su_an - o_bas) if o_bas > 0 else 0
             self.ekran.blit(self.font_hud_mini.render(f"Skor: {self.hesaplanan_basari_puani}", True, (30,30,30)), (15, 15))
             self.ekran.blit(self.font_hud_mini.render(f"Süre: {g_sn}s", True, (30,30,30)), (15, 40))
             self.ekran.blit(self.font_hud_mini.render(f"Tur: {self.tur_idx+1}/7", True, (30,30,30)), (15, 65))
-
             if self.intro_alpha < 255: self.intro_alpha += 5
             if self.mevcut_durum_etiketi == "INTRO_FADE" and self.intro_alpha >= 255: self.mevcut_durum_etiketi = "INTRO_MOVE"
             elif self.mevcut_durum_etiketi == "INTRO_MOVE":
                 if self.intro_y > 85: self.intro_y -= 4
                 else: self.mevcut_durum_etiketi = "SAYAC"; s_z = su_an
             t_i = self.font_arayuz_v.render("Örüntüyü Tamamla!", True, (30,30,30)); t_i.set_alpha(self.intro_alpha); self.ekran.blit(t_i, (self.pencere_W//2-t_i.get_width()//2, self.intro_y))
-
             if self.mevcut_durum_etiketi == "SAYAC":
                 self.__ms_render_et("HAZIR!", self.font_arayuz_v, (52, 152, 219), 250)
                 txt = self.font_baslik_v.render(str(self.gs_rakami), True, (230, 126, 34)); self.ekran.blit(txt, (self.pencere_W//2-txt.get_width()//2, self.pencere_H//2))
@@ -492,7 +422,6 @@ class DiziTamamlama(Oyun):
                             self.mevcut_durum_etiketi = "BITIS"; self.bitir()
                     else: self.mevcut_durum_etiketi = "SORU"
             elif self.mevcut_durum_etiketi == "BITIS": self.__final_render_v()
-
             for ev in pygame.event.get():
                 if ev.type == pygame.QUIT: self.oyun_aktif_durumu = False
                 if ev.type == pygame.MOUSEBUTTONDOWN:
@@ -542,7 +471,7 @@ class DiziTamamlama(Oyun):
         t = f.render(m, True, r); self.ekran.blit(t, (self.pencere_W // 2 - t.get_width() // 2, y))
 
 # =============================================================================================
-# 6. BÖLÜM: ANALİZ MOTORU (PROFESYONEL TABLO + DAİRE GRAFİĞİ)
+# 6. BÖLÜM: ANALİZ MOTORU (FIXED)
 # =============================================================================================
 
 class OgretmenAnalizModulu:
@@ -550,35 +479,23 @@ class OgretmenAnalizModulu:
         self.__db_path = veritabani_yolu
 
     def rapor_uret_v(self, ad_v, soyad_v):
-        """
-        --- 1) ÖZEL İSTEK: HESAPLAMA VE SUNUM MANTIĞI ---
-        PANDAS: Veritabanından ilgili öğrencinin tüm performans loglarını çeker.
-        MATPLOTLIB: Verileri görsel bir tablo ve pasta grafik olarak sentezler.
-        """
         try:
             bag = sqlite3.connect(self.__db_path)
+            # id yerine id (veya sütun adınız neyse) - id genelde standarttır
             df = pd.read_sql_query(f"SELECT * FROM performans WHERE ad='{ad_v}' AND soyad='{soyad_v}'", bag); bag.close()
             if df.empty: return "İlgili öğrenci için sistemde veri bulunamadı."
-            
-            # Matplotlib ile 2 katmanlı (Tablo üstte, Grafik altta) rapor tasarımı
             fig, (ax_table, ax_pie) = plt.subplots(2, 1, figsize=(11, 10))
             fig.patch.set_facecolor('#fdfdf2')
-            
-            # --- TABLO OLUŞTURMA (Nicel Veri Özeti) ---
             ax_table.axis('off')
             ax_table.set_title(f"Bilişsel Gelişim Raporu: {ad_v} {soyad_v}", fontsize=14, fontweight='bold', pad=20)
-            kolonlar = ["Oturum ID", "Oyun Modülü", "Doğru", "Hata", "Hız (ms)"]
-            # Son 10 oturumu tabloya aktar
-            tablo_verisi = df[['id', 'oyun_adi', 'dogru', 'yanlis', 'tepki_suresi']].tail(10).values
+            kolonlar = ["ID", "Oyun Modülü", "Doğru", "Hata", "Hız (ms)"]
+            tablo_verisi = df[['oyun_adi', 'dogru', 'yanlis', 'tepki_suresi']].tail(10).reset_index().values
             tablo = ax_table.table(cellText=tablo_verisi, colLabels=kolonlar, loc='center', cellLoc='center', colColours=["#3498db"]*5)
             tablo.auto_set_font_size(False); tablo.set_fontsize(10); tablo.scale(1, 1.8)
-            
-            # --- DAİRE GRAFİĞİ (Dikkat Dağılımı) ---
             labels = ['Başarılı Tepkiler', 'Hatalı Tepkiler']
             sizes = [df['dogru'].sum(), df['yanlis'].sum()]
             colors = ['#27ae60', '#e74c3c']
             ax_pie.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=140, explode=(0.05, 0))
             ax_pie.set_title('Genel Dikkat ve Başarı Oranı (%)', fontsize=12, fontweight='bold')
-            
             plt.tight_layout(); plt.show()
         except Exception as e: return f"Analiz motoru hatası: {e}"
