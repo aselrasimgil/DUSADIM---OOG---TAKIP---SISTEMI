@@ -175,16 +175,39 @@ class DusAdimPortal:
         tk.Button(p, text="ANALİZ GÖSTER", bg="#27ae60", fg="white", font=("Arial", 11, "bold"), command=lambda: self.analiz_yap(e_ad.get(), e_so.get())).pack(pady=30)
 
     def analiz_yap(self, a, s):
-        """PANDAS & MATPLOTLIB: Nicel verilerin görsel analizi ve raporlanması."""
         try:
             with sqlite3.connect("dusadim_final_V100.db") as bag:
                 df = pd.read_sql_query(f"SELECT * FROM performans WHERE ad='{a.capitalize()}' AND soyad='{s.upper()}'", bag)
-            if df.empty: messagebox.showinfo("Hata", "Kayıt yok."); return
+            
+            if df.empty: 
+                messagebox.showinfo("Bilgi", "Kayıt bulunamadı."); return
+            
             plt.figure(figsize=(12, 6))
-            plt.subplot(1, 2, 1); plt.plot(df.index + 1, df['tepki_suresi'], marker='o', color='#e67e22'); plt.title("Tepki Süresi")
-            plt.subplot(1, 2, 2); plt.pie([df['dogru'].sum(), df['yanlis'].sum()], labels=['Doğru', 'Hata'], autopct='%1.1f%%', colors=['#2ecc71', '#e74c3c']); plt.title("Başarı Oranı")
-            plt.tight_layout(); plt.show()
-        except Exception as e: messagebox.showerror("Hata", str(e))
+            
+            # --- SOL GRAFİK: HIZ ANALİZİ (GÜNCELLENEN KISIM) ---
+            plt.subplot(1, 2, 1)
+            # Her oyunu benzersiz bir renk ve isimle grafiğe ekler
+            for oyun_adi in df['oyun'].unique():
+                oyun_df = df[df['oyun'] == oyun_adi]
+                plt.plot(oyun_df.index + 1, oyun_df['tepki_suresi'], marker='o', linewidth=2, label=oyun_adi)
+            
+            plt.title(f"{a.capitalize()} - Bilişsel Hız Analizi")
+            plt.xlabel("Oturum Sayısı")
+            plt.ylabel("Tepki Süresi (ms)")
+            plt.legend() # Sağ üstteki "Hangi renk hangi oyun" kutusu
+            plt.grid(True, linestyle='--', alpha=0.6) # Arka plana yardımcı çizgiler ekler
+            
+            # --- SAĞ GRAFİK: BAŞARI ORANI ---
+            plt.subplot(1, 2, 2)
+            plt.pie([df['dogru'].sum(), df['yanlis'].sum()], labels=['Başarı', 'Hata'], 
+                    autopct='%1.1f%%', colors=['#2ecc71', '#e74c3c'], startangle=140)
+            plt.title("Kümülatif Başarı Oranı")
+            
+            plt.tight_layout()
+            plt.show()
+            
+        except Exception as e: 
+            messagebox.showerror("Analiz Hatası", f"Veri işlenemedi: {e}")
 
     # =============================================================================================
     # 4. BÖLÜM: OYUN SEÇİM MENÜSÜ (OOP: POLYMORPHISM - ÇOK BİÇİMLİLİK)

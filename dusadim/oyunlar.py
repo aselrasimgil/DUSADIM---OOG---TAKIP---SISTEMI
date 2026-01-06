@@ -86,6 +86,11 @@ class EvrenselArkaPlan:
 # =============================================================================================
 
 class Oyun(ABC):
+    """
+    Tüm oyun modülleri için soyut temel sınıf.
+    Ortak oyun döngüsü, skor, süre ve veritabanı işlemleri burada tanımlanır.
+    """
+     
     def __init__(self, ekran, veritabani, sinif_bilgisi, ogrenci_verisi):
         self.ekran = ekran
         self.vt = veritabani
@@ -475,6 +480,10 @@ class DiziTamamlama(Oyun):
 # =============================================================================================
 
 class OgretmenAnalizModulu:
+    """
+Öğretmenler için öğrenci performansını görselleştiren analiz modülü.
+Veriler SQLite veritabanından çekilerek grafikleştirilir.
+"""
     def __init__(self, veritabani_yolu="dusadim_final_V100.db"):
         self.__db_path = veritabani_yolu
 
