@@ -63,6 +63,19 @@ Geliştirici: Asel Rasimgil
 Kurum: Ankara Üniversitesi, Bilgisayar ve Öğretim Teknolojileri Öğretmenliği (BÖTE) Bölümü
 
 
+---
+
+## ⚖️ Lisans ve Kullanım Hakları
+
+Bu proje **MIT Lisansı** ile lisanslanmış açık kaynaklı bir yazılımdır. Projenin akademik ve sosyal fayda sağlaması amacıyla aşağıdaki haklar tüm kullanıcılara tanınmıştır:
+
+* [cite_start]**Kullanım:** Yazılım, eğitim ortamlarında veya bireysel çalışmalarda serbestçe kullanılabilir. [cite: 105]
+* [cite_start]**Değiştirme (Modifikasyon):** Projenin modüler (OOP) yapısı sayesinde kodlar ihtiyaca göre değiştirilebilir, yeni oyun modülleri veya analiz özellikleri eklenebilir. [cite: 102, 139]
+* [cite_start]**Dağıtım:** Yazılımın orijinal veya değiştirilmiş halleri, kaynak gösterilmek kaydıyla serbestçe dağıtılabilir. 
+
+[cite_start]DüşAdım projesinin temel vizyonu, özel eğitimde fırsat eşitliğini desteklemek ve bilimsel veriye dayalı müdahale süreçlerini herkes için erişilebilir kılmaktır. [cite: 106, 127]
+
+
 
 
 
