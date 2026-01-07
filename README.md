@@ -70,7 +70,9 @@ Kurum: Ankara Üniversitesi, Bilgisayar ve Öğretim Teknolojileri Öğretmenli�
 Bu proje **MIT Lisansı** ile lisanslanmış açık kaynaklı bir yazılımdır. Projenin akademik ve sosyal fayda sağlaması amacıyla aşağıdaki haklar tüm kullanıcılara tanınmıştır:
 
 **Kullanım:** Yazılım, eğitim ortamlarında veya bireysel çalışmalarda serbestçe kullanılabilir. [cite: 105]
-**Değiştirme (Modifikasyon):** Projenin modüler (OOP) yapısı sayesinde kodlar ihtiyaca göre değiştirilebilir, yeni oyun modülleri veya analiz özellikleri eklenebilir. [cite: 102, 139]
+
+**Değiştirme:** Projenin modüler (OOP) yapısı sayesinde kodlar ihtiyaca göre değiştirilebilir, yeni oyun modülleri veya analiz özellikleri eklenebilir. [cite: 102, 139]
+
 **Dağıtım:** Yazılımın orijinal veya değiştirilmiş halleri, kaynak gösterilmek kaydıyla serbestçe dağıtılabilir. 
 
 DüşAdım projesinin temel vizyonu, özel eğitimde fırsat eşitliğini desteklemek ve bilimsel veriye dayalı müdahale süreçlerini herkes için erişilebilir kılmaktır. [cite: 106, 127]
